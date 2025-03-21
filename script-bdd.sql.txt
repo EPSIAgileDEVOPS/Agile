@@ -1,0 +1,79 @@
+CREATE TABLE users (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    role ENUM('student', 'staff') NOT NULL,
+    password VARCHAR(255),
+   is_active BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE campus (
+    campus_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    address VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE floors (
+    floor_id INT PRIMARY KEY AUTO_INCREMENT,
+    campus_id INT,
+    floor_number INT NOT NULL,
+    FOREIGN KEY (campus_id) REFERENCES campus(campus_id)
+);
+
+CREATE TABLE rooms (
+    room_id INT PRIMARY KEY AUTO_INCREMENT,
+    floor_id INT,
+    room_number VARCHAR(10) NOT NULL,
+    capacity INT NOT NULL,
+    equipment TEXT,
+    FOREIGN KEY (floor_id) REFERENCES floors(floor_id)
+);
+
+CREATE TABLE reservations (
+    reservation_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    room_id INT,
+    reservation_date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    status ENUM('active', 'cancelled') NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (room_id) REFERENCES rooms(room_id)
+);
+
+CREATE TABLE incidents (
+    incident_id INT PRIMARY KEY AUTO_INCREMENT,
+    reservation_id INT,
+    user_id INT,
+    description TEXT NOT NULL,
+    incident_date DATETIME NOT NULL,
+    FOREIGN KEY (reservation_id) REFERENCES reservations(reservation_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE equipment (
+    equipment_id INT PRIMARY KEY AUTO_INCREMENT,
+    room_id INT,
+    equipment_name VARCHAR(100) NOT NULL,
+    quantity INT NOT NULL,
+    FOREIGN KEY (room_id) REFERENCES rooms(room_id)
+);
+
+CREATE TABLE room_locks (
+    lock_id INT PRIMARY KEY AUTO_INCREMENT,
+    room_id INT,
+    locked_by INT,
+    lock_date DATETIME NOT NULL,
+    FOREIGN KEY (room_id) REFERENCES rooms(room_id),
+    FOREIGN KEY (locked_by) REFERENCES users(user_id)
+);
+
+CREATE TABLE user_bans (
+    ban_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    banned_by INT,
+    ban_date DATETIME NOT NULL,
+    ban_reason TEXT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (banned_by) REFERENCES users(user_id)
+);
